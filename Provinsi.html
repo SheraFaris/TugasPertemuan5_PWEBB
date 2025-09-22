@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pencarian Kode Pos Indonesia</title>
+  <style>
+    body{font:15px/1.6 system-ui,Segoe UI,Roboto;background:#f5f6fa;margin:0;padding:30px}
+    h1{margin-top:0;color:#b91c1c}
+    .card{background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.08);padding:20px;max-width:640px;margin:auto}
+    label{display:block;margin:12px 0 4px}
+    select,input,button{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px}
+    button{background:#16a34a;color:#fff;font-weight:600;cursor:pointer;margin-top:14px}
+    button:hover{background:#15803d}
+    .result{margin-top:20px;padding:15px;border-radius:10px;background:#ecfdf5;border:1px solid #bbf7d0}
+    .result h3{margin:0 0 6px;color:#065f46}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Kode Pos Indonesia</h1>
+
+    <label for="prov">Provinsi</label>
+    <select id="prov">
+      <option value="">-- Pilih Provinsi --</option>
+      <option value="jatim">Jawa Timur</option>
+      <option value="jateng">Jawa Tengah</option>
+    </select>
+
+    <label for="kota">Kota/Kabupaten</label>
+    <select id="kota">
+      <option value="">-- Pilih Kota/Kabupaten --</option>
+    </select>
+
+    <label for="kec">Masukkan Kata Kunci / Kecamatan</label>
+    <input type="text" id="kec" placeholder="contoh: Sukolilo atau 60111">
+
+    <button id="cari">Cari</button>
+
+    <div id="hasil"></div>
+  </div>
+
+  <script>
+    // Data simulasi kode pos (cukup contoh kecil)
+    const dataKodePos = {
+      jatim: {
+        "Surabaya": [
+          { kec: "Sukolilo", kel: "Keputih", kode: "60111" },
+          { kec: "Wonokromo", kel: "Darmo", kode: "60241" }
+        ],
+        "Malang": [
+          { kec: "Lowokwaru", kel: "Tunggulwulung", kode: "65144" }
+        ]
+      },
+      jateng: {
+        "Semarang": [
+          { kec: "Tembalang", kel: "Bulusan", kode: "50277" }
+        ]
+      }
+    };
+
+    // Dropdown provinsi -> kota
+    const prov = document.getElementById("prov");
+    const kota = document.getElementById("kota");
+    prov.addEventListener("change", () => {
+      kota.innerHTML = '<option value="">-- Pilih Kota/Kabupaten --</option>';
+      if (prov.value && dataKodePos[prov.value]) {
+        Object.keys(dataKodePos[prov.value]).forEach(k => {
+          const opt = document.createElement("option");
+          opt.value = k;
+          opt.textContent = k;
+          kota.appendChild(opt);
+        });
+      }
+    });
+
+    // Tombol cari
+    document.getElementById("cari").addEventListener("click", () => {
+      const p = prov.value;
+      const k = kota.value;
+      const q = document.getElementById("kec").value.toLowerCase();
+      const hasilDiv = document.getElementById("hasil");
+      hasilDiv.innerHTML = "";
+
+      if (!p || !k || !q) {
+        hasilDiv.innerHTML = "<p style='color:red'>Mohon isi semua field pencarian.</p>";
+        return;
+      }
+
+      const data = dataKodePos[p][k] || [];
+      const hasil = data.filter(d =>
+        d.kec.toLowerCase().includes(q) ||
+        d.kel.toLowerCase().includes(q) ||
+        d.kode.includes(q)
+      );
+
+      if (hasil.length === 0) {
+        hasilDiv.innerHTML = "<p>Tidak ditemukan hasil untuk kata kunci tersebut.</p>";
+        return;
+      }
+
+      hasil.forEach(item => {
+        const box = document.createElement("div");
+        box.className = "result";
+        box.innerHTML = `
+          <h3>${item.kel}, ${item.kec} - ${k}</h3>
+          <p>Kode Pos: <b>${item.kode}</b></p>
+        `;
+        hasilDiv.appendChild(box);
+      });
+    });
+  </script>
+</body>
+</html>
