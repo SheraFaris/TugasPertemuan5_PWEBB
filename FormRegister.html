@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Form Registrasi Mahasiswa</title>
+  <style>
+    :root{ --bg:#f7f7fb; --card:#fff; --text:#111827; --muted:#6b7280; --prim:#2563eb; --err:#b91c1c; }
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);font:15px/1.6 system-ui,Segoe UI,Roboto}
+    .wrap{max-width:640px;margin:40px auto;padding:24px;background:var(--card);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+    h1{margin:0 0 12px} p.hint{color:var(--muted);margin-top:0}
+    label{display:block;margin:14px 0 6px;color:#111} input,select,button{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px}
+    input:focus,select:focus{outline:none;border-color:var(--prim);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+    small{display:block;color:var(--muted);margin-top:6px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .err{color:var(--err);margin-top:6px;display:none}
+    button{background:var(--prim);color:#fff;border:0;margin-top:14px;cursor:pointer}
+    button:hover{filter:brightness(.96)}
+  </style>
+</head>
+<body>
+  <form class="wrap" id="regForm" novalidate>
+    <h1>Form Registrasi</h1>
+    <p class="hint">Isi data berikut. Saran nama akan muncul saat mengetik.</p>
+
+    <!-- NAMA + datalist (rekomendasi muncul saat mengetik huruf tertentu) -->
+    <label for="nama">Nama</label>
+    <input id="nama" name="nama" list="namaList" placeholder="Nama lengkap" autocomplete="off" required />
+    <datalist id="namaList">
+      <!-- Contoh daftar saran; browser memfilter otomatis sesuai huruf yang diketik -->
+      <option value="Andi Wijaya"></option>
+      <option value="Budi Santoso"></option>
+      <option value="Citra Lestari"></option>
+      <option value="Dewi Ayu"></option>
+      <option value="Eka Putra"></option>
+      <option value="Faris Ramadhan"></option>
+      <option value="Gita Prameswari"></option>
+      <option value="Hadi Pratama"></option>
+      <option value="Intan Sari"></option>
+      <option value="Joko Saputra"></option>
+    </datalist>
+    <small>Ketik huruf (mis. “A”, “De”, “Far”) → muncul rekomendasi yang cocok.</small>
+    <div id="err-nama" class="err">Nama tidak boleh kosong.</div>
+
+    <!-- EMAIL -->
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" placeholder="email@kampus.ac.id" required />
+    <div id="err-email" class="err">Email tidak boleh kosong / format tidak valid.</div>
+
+    <!-- NIM + pola angka -->
+    <label for="nim">NIM</label>
+    <input id="nim" name="nim" inputmode="numeric" pattern="\\d{8,12}" placeholder="Hanya angka, 8–12 digit" required />
+    <div id="err-nim" class="err">NIM harus 8–12 digit angka.</div>
+
+    <div class="row">
+      <!-- MATA KULIAH -->
+      <div>
+        <label for="mk">Mata Kuliah</label>
+        <select id="mk" name="mk" required>
+          <option value="">Pilih Mata Kuliah</option>
+          <option>Pemrograman Web</option>
+          <option>Struktur Data</option>
+          <option>Basis Data</option>
+          <option>Sistem Operasi</option>
+          <option>Jaringan Komputer</option>
+        </select>
+        <div id="err-mk" class="err">Harap pilih mata kuliah.</div>
+      </div>
+
+      <!-- DOSEN -->
+      <div>
+        <label for="dosen">Dosen</label>
+        <select id="dosen" name="dosen" required>
+          <option value="">Pilih Dosen</option>
+          <option>Dr. Andhika</option>
+          <option>Ir. Budi, M.Kom</option>
+          <option>Dr. Citra</option>
+          <option>Hadi, M.T.</option>
+        </select>
+        <div id="err-dosen" class="err">Harap pilih dosen.</div>
+      </div>
+    </div>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    // Helper: tampilkan/ sembunyikan error
+    function showErr(id, show){
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.style.display = show ? "block" : "none";
+    }
+
+    const form = document.getElementById("regForm");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault(); // cegah submit default untuk validasi manual
+
+      const nama  = document.getElementById("nama");
+      const email = document.getElementById("email");
+      const nim   = document.getElementById("nim");
+      const mk    = document.getElementById("mk");
+      const dosen = document.getElementById("dosen");
+
+      let ok = true;
+
+      // Validasi Nama
+      if (!nama.value.trim()){
+        showErr("err-nama", true); ok = false;
+      } else { showErr("err-nama", false); }
+
+      // Validasi Email
+      if (!email.value.trim()){
+        alert("Email Tidak Boleh Kosong");        // sesuai contoh gambar
+        showErr("err-email", true); ok = false;
+      } else if (!email.checkValidity()){
+        alert("Format email tidak valid");
+        showErr("err-email", true); ok = false;
+      } else { showErr("err-email", false); }
+
+      // Validasi NIM (8–12 digit)
+      if (!nim.checkValidity()){
+        showErr("err-nim", true); ok = false;
+      } else { showErr("err-nim", false); }
+
+      // Validasi pilihan
+      showErr("err-mk",    mk.value === "");
+      showErr("err-dosen", dosen.value === "");
+      if (mk.value === "" || dosen.value === "") ok = false;
+
+      if (ok){
+        // Contoh: data siap dikirim (fetch/XHR) atau tampilkan ringkasan
+        alert("Registrasi berhasil!\n" +
+              `Nama: ${nama.value}\nNIM: ${nim.value}\nMK: ${mk.value}\nDosen: ${dosen.value}\nEmail: ${email.value}`);
+        form.reset();
+      }
+    });
+
+    // Bonus: tips kapitalisasi nama (rekomendasi interaktif ringan)
+    document.getElementById("nama").addEventListener("blur", (e) => {
+      const v = e.target.value.trim();
+      if (v && v === v.toLowerCase()){
+        // otomatis kapitalisasi awal kata
+        e.target.value = v.replace(/\b[a-z]/g, ch => ch.toUpperCase());
+      }
+    });
+  </script>
+</body>
+</html>
