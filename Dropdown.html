@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Dynamic Drop Down List</title>
+<style>
+  body{font:16px/1.5 system-ui; padding:24px}
+  label{margin-right:8px}
+  select{padding:6px 8px; margin-right:12px}
+</style>
+</head>
+<body>
+  <h2>Dynamic Drop Down List dengan JavaScript</h2>
+
+  <label for="jenis">Jenis Produk</label>
+  <select id="jenis">
+    <option value="">Pilih Jenis Produk</option>
+    <option value="Desktop">Desktop</option>
+    <option value="Laptop">Laptop</option>
+    <option value="Smartphone">Smartphone</option>
+  </select>
+
+  <label for="merk">Merk</label>
+  <select id="merk" disabled>
+    <option value="">Pilih Merk</option>
+  </select>
+
+  <script>
+    // Peta data: jenis -> daftar merk
+    const DATA = {
+      Desktop:   ["Dell","HP","Lenovo","Acer"],
+      Laptop:    ["ASUS","Acer","Apple","MSI"],
+      Smartphone:["Samsung","Xiaomi","Apple","OPPO","Vivo"]
+    };
+
+    const jenisEl = document.getElementById("jenis");
+    const merkEl  = document.getElementById("merk");
+
+    function resetMerk() {
+      merkEl.innerHTML = '<option value="">Pilih Merk</option>';
+      merkEl.disabled = true;
+    }
+
+    jenisEl.addEventListener("change", () => {
+      const val = jenisEl.value;
+      resetMerk();
+      if (!val || !DATA[val]) return;
+
+      // isi opsi merk sesuai jenis
+      DATA[val].forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m; opt.textContent = m;
+        merkEl.appendChild(opt);
+      });
+      merkEl.disabled = false;
+    });
+
+    // inisialisasi awal
+    resetMerk();
+  </script>
+</body>
+</html>
